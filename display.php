@@ -128,8 +128,8 @@ include("template/header.php");
             </tbody>
         </table>
         <div class="flex">
-            <canvas id="myChartLine" class="mt-5 w-full h-8"></canvas>
-            <canvas id="myChartBar" class="mt-5 w-full h-8"></canvas>
+            <canvas id="myChartLine" height="120" class="mt-5 w-full"></canvas>
+            <canvas id="myChartBar" height="120" class="mt-5 w-full"></canvas>
         </div>
     </div>
 
