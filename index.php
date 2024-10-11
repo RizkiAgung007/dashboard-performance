@@ -23,6 +23,9 @@ include("template/header.php");
             <li>
                 <a href="display.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">Display</a>
             </li>
+            <li>
+                <a href="dashboard.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
+            </li>
         </ul>
     </div>
 
@@ -32,7 +35,7 @@ include("template/header.php");
         <form action="proces.php" method="POST" class="bg-white shadow-md rounded-lg p-6">
             <div class="mb-4">
                 <label for="year_name" class="block text-sm font-medium text-gray-700">Tahun</label>
-                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" id="year_name" name="year_name" required>
+                <input type="date" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" id="year_name" name="year_name" required>
             </div>
 
             <div class="mb-4">
@@ -41,15 +44,15 @@ include("template/header.php");
             </div>
 
             <div class="mb-4">
-                <label for="month_name" class="block text-sm font-medium text-gray-700">Bulan</label>
-                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" id="month_name" name="month_name" required>
-            </div>
-
-            <div class="mb-4">
                 <label for="area_name" class="block text-sm font-medium text-gray-700">Area</label>
                 <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" id="area_name" name="area_name" required>
             </div>
         
+            <div class="mb-4">
+                <label for="value_name" class="block text-sm font-medium text-gray-700">Penjualan</label>
+                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" id="value_name" name="value_name" required>
+            </div>
+
             <div class="mb-4">
                 <label for="target_value" class="block text-sm font-medium text-gray-700">Target</label>
                 <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" id="target_value" name="target_value" required>

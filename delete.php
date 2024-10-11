@@ -5,15 +5,15 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     // Mengambil product_grup_id dan area_grup_id serta month_id sebelum menghapus target_grup
-    $sqlGetIds = "SELECT product_grup_id, area_id, month_id, year_id FROM target_grup WHERE id = '$id'";
+    $sqlGetIds = "SELECT product_grup_id, area_id, year_id, value_id FROM target_grup WHERE id = '$id'";
     $result = mysqli_query($conn, $sqlGetIds);
     $row = mysqli_fetch_assoc($result);
 
     if ($row) {
         $product_grup_id = $row['product_grup_id'];
         $area_grup_id = $row['area_id'];
-        $month_grup_id = $row['month_id'];
         $year_grup_id = $row['year_id'];
+        $value_grup_id = $row['value_id'];
 
         // Menghapus data dari tabel target_grup
         $sqlDeleteTarget = "DELETE FROM target_grup WHERE id = '$id'";
@@ -40,22 +40,22 @@ if (isset($_GET['id'])) {
                 mysqli_query($conn, $sqlDeleteArea);
             }
 
-            // Menghapus data dari tabel month_grup jika tidak ada referensi di target_grup
-            $checkMonthReferencing = "SELECT COUNT(*) AS count FROM target_grup WHERE month_id = '$month_grup_id'";
-            $checkMonthResult = mysqli_query($conn, $checkMonthReferencing);
-            $checkMonthRow = mysqli_fetch_assoc($checkMonthResult);
-            if ($checkMonthRow['count'] == 0) {
-                $sqlDeleteMonth = "DELETE FROM month_grup WHERE id = '$month_grup_id'";
-                mysqli_query($conn, $sqlDeleteMonth);
-            }
-
-            // Menghapus data dari tabel product_grup jika tidak ada refrensi di target_grup
+            // Menghapus data dari tabel year_grup jika tidak ada refrensi di target_grup
             $checkYearReferencing = "SELECT COUNT(*) AS count FROM target_grup WHERE year_id = '$year_grup_id'";
             $checkYearResult = mysqli_query($conn, $checkYearReferencing);
             $checkYearRow = mysqli_fetch_assoc($checkYearResult);
             if ($checkYearRow['count'] == 0) {
             $sqlDeleteYear = "DELETE FROM year_grup WHERE id = '$year_grup_id'";
                 mysqli_query($conn, $sqlDeleteYear);
+            }
+
+            // Menghapus data dari tabel value_grup jika tidak ada refrensi di target_grup
+            $checkValueReferencing = "SELECT COUNT(*) AS count FROM target_grup WHERE value_id = '$value_grup_id'";
+            $checkValueResult = mysqli_query($conn, $checkValueReferencing);
+            $checkValueRow = mysqli_fetch_assoc($checkValueResult);
+            if ($checkValueRow['count'] == 0) {
+            $sqlDeleteValue = "DELETE FROM value_grup WHERE id = '$value_grup_id'";
+                mysqli_query($conn, $sqlDeleteValue);
             }
 
             session_start();

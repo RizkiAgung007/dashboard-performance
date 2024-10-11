@@ -6,12 +6,12 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     // Mengambil data dari database berdasarkan id
-    $sql = "SELECT pg.grup_name, ag.area_name, tg.target_value, mg.month_name, yg.year_name 
+    $sql = "SELECT pg.grup_name, ag.area_name, tg.target_value, vg.value_name, yg.year_name 
             FROM target_grup tg
             JOIN product_grup pg ON tg.product_grup_id = pg.id
             JOIN area_grup ag ON tg.area_id = ag.id
-            JOIN month_grup mg ON tg.month_id = mg.id
             JOIN year_grup yg ON tg.year_id = yg.id
+            JOIN value_grup vg ON tg.value_id = vg.id
             WHERE tg.id = '$id'";
     $result = mysqli_query($conn, $sql);
     if (!$result) {
@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $area_name = mysqli_real_escape_string($conn, $_POST['area_name']);
     $target_value = mysqli_real_escape_string($conn, $_POST['target_value']);
     $year_name = mysqli_real_escape_string($conn, $_POST['year_name']);
-    $month_name = mysqli_real_escape_string($conn, $_POST['month_name']);
+    $value_name = mysqli_real_escape_string($conn, $_POST['value_name']);
 
     // Mengupdate data
     $updateSql = "UPDATE target_grup tg
@@ -50,14 +50,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<div class='bg-red-500 text-white p-3 rounded-md mb-4'>Error updating area_name: " . mysqli_error($conn) . "</div>";
     }
 
-    $updateMonthSql = "UPDATE month_grup SET month_name = '$month_name' WHERE id = (SELECT month_id FROM target_grup WHERE id = '$id')";
-    if (!mysqli_query($conn, $updateMonthSql)) {
-        echo "<div class='bg-red-500 text-white p-3 rounded-md mb-4'>Error updating month_name: " . mysqli_error($conn) . "</div>";
-    }
-
     $updateYearSql = "UPDATE year_grup SET year_name = '$year_name' WHERE id = (SELECT year_id FROM target_grup WHERE id = '$id')";
     if (!mysqli_query($conn, $updateYearSql)) {
         echo "<div class='bg-red-500 text-white p-3 rounded-md mb-4'>Error updating year_name: " . mysqli_error($conn) . "</div>";
+    }
+
+    $updateValueSql = "UPDATE value_grup SET value_name = '$value_name' WHERE id = (SELECT value_id FROM target_grup WHERE id = '$id')";
+    if (!mysqli_query($conn, $updateValueSql)) {
+        echo "<div class='bg-red-500 text-white p-3 rounded-md mb-4'>Error updating value_name: " . mysqli_error($conn) . "</div>";
     }
 
     // Mengecek apakah ada perubahan data
@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form action="" method="POST">
         <div class="mb-4">
             <label for="year_name" class="block text-lg font-medium text-gray-700">Tahun</label>
-            <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" id="year_name" name="year_name" value="<?php echo htmlspecialchars($row['year_name']); ?>" required>
+            <input type="date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" id="year_name" name="year_name" value="<?php echo htmlspecialchars($row['year_name']); ?>" required>
         </div>
 
         <div class="mb-4">
@@ -92,8 +92,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="mb-4">
-            <label for="month_name" class="block text-lg font-medium text-gray-700">Bulan</label>
-            <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" id="month_name" name="month_name" value="<?php echo htmlspecialchars($row['month_name']); ?>" required>
+            <label for="value_name" class="block text-lg font-medium text-gray-700">Penjualan</label>
+            <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" id="value_name" name="value_name" value="<?php echo htmlspecialchars($row['value_name']); ?>" required>
         </div>
 
         <div class="mb-4">

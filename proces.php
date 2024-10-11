@@ -3,8 +3,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $grup_name = $_POST['grup_name'];
     $area_name = $_POST['area_name'];
     $target_value = $_POST['target_value'];
-    $month_name = $_POST['month_name'];
     $year_name = $_POST['year_name'];
+    $value_name = $_POST['value_name'];
 
     include("connect.php");
 
@@ -42,23 +42,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Mengecek apakah sudah ada bulan di dalam database
-    $checkMonth = "SELECT id FROM month_grup WHERE month_name = '$month_name'";
-    $resultMonth = mysqli_query($conn, $checkMonth);
-    if ($resultMonth->num_rows > 0) {
-        $row = $resultMonth->fetch_assoc();
-        $month_id = $row['id'];
-        
-        // Jika bulan tidak ada, Anda bisa memasukkan bulan baru jika perlu
-    } else {
-        $insertMonth = "INSERT INTO month_grup (month_name) VALUES ('$month_name')";
-        if (mysqli_query($conn, $insertMonth) === TRUE) {
-            $month_id = mysqli_insert_id($conn);
-        } else {
-        echo "ERROR: " . $insertMonth . "<br>";
-        }
-    }
-
     // Mengecek apakah sudah ada tahun didalam database
     $checkYear = "SELECT id FROM year_grup WHERE year_name = '$year_name'";
     $resultYear = mysqli_query($conn, $checkYear);
@@ -68,16 +51,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Jika tidak ada tahun yang sama maka buat baru
     } else {
-        $insertYear = "INSERT INTO year_grup (year_name) VALUES ($year_name)";
+        $insertYear = "INSERT INTO year_grup (year_name) VALUES ('$year_name')";
         if (mysqli_query($conn, $insertYear) === TRUE) {
             $year_id = mysqli_insert_id($conn);
         } else {
             echo "ERROR: ". $insertYear. "<br>";
         }
     }
+    // 
+    // Mengecek apakah sudah ada value didalam database
+    $checkValue = "SELECT id FROM value_grup WHERE value_name = '$value_name'";
+    $resultValue = mysqli_query($conn, $checkValue);
+    if ($resultValue -> num_rows > 0) {
+        $row = $resultValue -> fetch_assoc();
+        $value_id = $row['id'];
+
+        // Jika tidak ada tahun yang sama maka buat baru
+    } else {
+        $insertValue = "INSERT INTO value_grup (value_name) VALUES ('$value_name')";
+        if (mysqli_query($conn, $insertValue) === TRUE) {
+            $value_id = mysqli_insert_id($conn);
+        } else {
+            echo "ERROR: ". $insertValue. "<br>";
+        }
+    }
        
-    // Memasukkan produk, area, bulan, dan target ke dalam tabel target_grup
-    $insertTarget = "INSERT INTO target_grup (product_grup_id, area_id, target_value, month_id, year_id) VALUES ('$product_grup_id', '$area_id', '$target_value', '$month_id', '$year_id')";
+    // Memasukkan tahun, produk, area, penjualan dan target ke dalam tabel target_grup
+    $insertTarget = "INSERT INTO target_grup (product_grup_id, area_id, target_value, year_id, value_id) VALUES ('$product_grup_id', '$area_id', '$target_value', '$year_id', '$value_id')";
 
     if (mysqli_query($conn, $insertTarget) === TRUE) {
         echo "Data berhasil tersimpan";
