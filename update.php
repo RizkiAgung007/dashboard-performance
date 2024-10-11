@@ -6,12 +6,13 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     // Mengambil data dari database berdasarkan id
-    $sql = "SELECT pg.grup_name, ag.area_name, tg.target_value, vg.value_name, yg.year_name 
+    $sql = "SELECT pg.grup_name, ag.area_name, tg.target_value, vg.value_name, yg.year_name, cg.channel_name
             FROM target_grup tg
             JOIN product_grup pg ON tg.product_grup_id = pg.id
             JOIN area_grup ag ON tg.area_id = ag.id
             JOIN year_grup yg ON tg.year_id = yg.id
             JOIN value_grup vg ON tg.value_id = vg.id
+            JOIN channel_grup cg ON tg.channel_id = cg.id
             WHERE tg.id = '$id'";
     $result = mysqli_query($conn, $sql);
     if (!$result) {
@@ -28,6 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $target_value = mysqli_real_escape_string($conn, $_POST['target_value']);
     $year_name = mysqli_real_escape_string($conn, $_POST['year_name']);
     $value_name = mysqli_real_escape_string($conn, $_POST['value_name']);
+    $channel_name = mysqli_real_escape_string($conn, $_POST['channel_name']);
 
     // Mengupdate data
     $updateSql = "UPDATE target_grup tg
@@ -60,6 +62,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<div class='bg-red-500 text-white p-3 rounded-md mb-4'>Error updating value_name: " . mysqli_error($conn) . "</div>";
     }
 
+    $updateChanneleSql = "UPDATE channel_grup SET channel_name = '$channel_name' WHERE id = (SELECT channel_id FROM target_grup WHERE id = '$id')";
+    if (!mysqli_query($conn, $updateChanneleSql)) {
+        echo "<div class='bg-red-500 text-white p-3 rounded-md mb-4'>Error updating channel_name: " . mysqli_error($conn) . "</div>";
+    }
+
     // Mengecek apakah ada perubahan data
     if (mysqli_affected_rows($conn) > 0) {
         echo "<div class='bg-green-500 text-white p-3 rounded-md mb-4'>Data berhasil diupdate.</div>";
@@ -79,6 +86,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="mb-4">
             <label for="year_name" class="block text-lg font-medium text-gray-700">Tahun</label>
             <input type="date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" id="year_name" name="year_name" value="<?php echo htmlspecialchars($row['year_name']); ?>" required>
+        </div>
+
+        <div class="mb-4">
+            <label for="channel" class="block text-sm font-medium text-gray-700">Channel</label>
+                <select id="channel_name" name="channel_name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <option value="MT">MT</option>
+                    <option value="GT">GT</option>
+                </select>
         </div>
 
         <div class="mb-4">

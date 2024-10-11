@@ -5,12 +5,13 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     // Mengambil data dari database berdasarkan ID
-    $sql = "SELECT pg.grup_name, ag.area_name, tg.target_value, vg.value_name, yg.year_name
+    $sql = "SELECT pg.grup_name, ag.area_name, tg.target_value, vg.value_name, yg.year_name, cg.channel_name
             FROM target_grup tg
             JOIN product_grup pg ON tg.product_grup_id = pg.id
             JOIN area_grup ag ON tg.area_id = ag.id
             JOIN year_grup yg ON tg.year_id = yg.id
             JOIN value_grup vg ON tg.value_id = vg.id
+            JOIN channel_grup cg ON tg.channel_id = cg.id
             WHERE tg.id = '$id'";
     $result = mysqli_query($conn, $sql);
     $row = $result->fetch_assoc();
@@ -28,7 +29,10 @@ include("template/header.php")
         <p class="text-lg"><strong>Tahun:</strong> <span class="text-gray-700"><?php echo $row['year_name']; ?></span></p>
     </div>
     <div class="mb-4">
-        <p class="text-lg"><strong>Product Grup:</strong> <span class="text-gray-700"><?php echo $row['grup_name']; ?></span></p>
+        <p class="text-lg"><strong>Channel:</strong> <span class="text-gray-700"><?php echo $row['channel_name']; ?></span></p>
+    </div>
+    <div class="mb-4">
+        <p class="text-lg"><strong>Produk:</strong> <span class="text-gray-700"><?php echo $row['grup_name']; ?></span></p>
     </div>
     <div class="mb-4">
         <p class="text-lg"><strong>Area:</strong> <span class="text-gray-700"><?php echo $row['area_name']; ?></span></p>

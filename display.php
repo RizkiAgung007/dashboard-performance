@@ -10,13 +10,13 @@ include("template/header.php");
     }
 
     canvas {
-        max-width: 50%; /* Canvas tidak lebih lebar dari kontainer */
-        height: auto; /* Tinggi akan menyesuaikan dengan lebar */
+        max-width: 50%; 
+        height: auto; 
     }
 </style>
 
 <div class="flex bg-gray-100 min-h-screen">
-    <div class="flex flex-col bg-white shadow-lg w-64 p-4">
+    <div class="flex sidebar flex-col bg-white shadow-lg w-[292px] p-4">
         <div class="flex items-center justify-between">
             <a href="/" class="text-xl font-semibold text-gray-700">Dashboard</a>
         </div>
@@ -30,6 +30,12 @@ include("template/header.php");
             </li>
             <li>
                 <a href="dashboard.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
+            </li>
+            <li>
+                <a href="lineChart.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">LineChart</a>
+            </li>
+            <li>
+                <a href="barChart.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">BarChart</a>
             </li>
         </ul>
     </div>
@@ -87,10 +93,30 @@ include("template/header.php");
             </div>
         </div>
 
+        <?php
+        $filter_channel = ''; 
+
+        if (isset($_GET['filter_channel'])) {
+            $filter_channel = $_GET['filter_channel']; 
+        }        
+        ?>
+        <div class="max-w-md mx-auto mt-8 p-4 bg-white shadow-md rounded-lg mb-8">
+            <form method="GET" action="">
+                <label for="filter_channel" class="block text-sm font-medium text-gray-700">Channel</label>
+                <select id="filter_channel" name="filter_channel" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                    <option value="">-- Select Channel --</option>
+                    <option value="MT" <?php if ($filter_channel === 'MT') echo 'selected'; ?>>MT</option>
+                    <option value="GT" <?php if ($filter_channel === 'GT') echo 'selected'; ?>>GT</option>
+                </select>
+                <button type="submit" class="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200">Filter</button>
+            </form>
+        </div>
+
         <table class="min-w-full bg-white shadow-md rounded border border-gray-200">
             <thead>
                 <tr class="bg-gray-100 text-gray-700">
                     <th class="py-3 px-4 border-b text-center">Tahun</th>
+                    <th class="py-3 px-4 border-b text-center">Channel</th>
                     <th class="py-3 px-4 border-b text-center">Produk</th>
                     <th class="py-3 px-4 border-b text-center">Area</th>
                     <th class="py-3 px-4 border-b text-center">Penjualan</th>
@@ -101,18 +127,26 @@ include("template/header.php");
                 <?php
                 include("connect.php");
 
-                $sql = "SELECT tg.id, pg.grup_name, ag.area_name, tg.target_value, vg.value_name, yg.year_name
+                $sql = "SELECT tg.id, pg.grup_name, ag.area_name, tg.target_value, vg.value_name, yg.year_name, cg.channel_name
                 FROM target_grup tg
                 JOIN product_grup pg ON tg.product_grup_id = pg.id
                 JOIN area_grup ag ON tg.area_id = ag.id
                 JOIN value_grup vg ON tg.value_id = vg.id
-                JOIN year_grup yg ON tg.year_id = yg.id";
+                JOIN year_grup yg ON tg.year_id = yg.id
+                JOIN channel_grup cg ON tg.channel_id = cg.id";
+
+
+                if ($filter_channel) {
+                    $sql .= " WHERE cg.channel_name = '$filter_channel'";
+                }
+
                 $result = mysqli_query($conn, $sql);
 
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr class='text-center'>
                                 <td class='py-2 px-4 border-b'>" . $row['year_name'] . "</td>
+                                <td class='py-2 px-4 border-b'>" . $row['channel_name'] . "</td>
                                 <td class='py-2 px-4 border-b'>" . $row['grup_name'] . "</td>
                                 <td class='py-2 px-4 border-b'>" . $row['area_name'] . "</td>
                                 <td class='py-2 px-4 border-b'>" . $row['value_name'] . "</td>
@@ -138,8 +172,8 @@ include("template/header.php");
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    function ChartLine() {
-        fetch('get_data.php')
+    function ChartLine(filter_channel) {
+        fetch('get_data.php?filter_channel=' + filter_channel)
             .then(response => response.json())
             .then(data => {
                 const labels = data.map(item => item.area_name);
@@ -161,46 +195,32 @@ include("template/header.php");
                         }, {
                             label: 'Penjualan',
                             data: valueSale,
-                            backgroundColor: 'rgba(255, 0, 0, 0.2)',
-                            borderColor: 'rgba(255, 0, 0, 1)',
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
                             borderWidth: 1
                         }]
                     },
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                title: { display: true, text: 'Target' }
-                            },
-                            x: {
-                                title: { display: true, text: 'Area' }
-                            }
-                        },
-                        tooltips: {
-                            callbacks: {
-                                title: function(tooltipItem, data) {
-                                    const index = tooltipItem[0].index;
-                                    return productNames[index];
-                                }
+                                beginAtZero: true
                             }
                         }
                     }
                 });
-            })
-            .catch(error => console.error('Error fetching data:', error));
+            });
     }
 
-    function ChartBar() {
-        fetch('get_data.php')
+    function ChartBar(filter_channel) {
+        fetch('get_data.php?filter_channel=' + filter_channel)
             .then(response => response.json())
             .then(data => {
                 const labels = data.map(item => item.area_name);
                 const targetValues = data.map(item => item.target_value);
-                const productNames = data.map(item => item.grup_name);
                 const valueSale = data.map(item => item.value_name);
 
-                const cty = document.getElementById('myChartBar').getContext('2d');
-                new Chart(cty, {
+                const ctx = document.getElementById('myChartBar').getContext('2d');
+                new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -208,44 +228,29 @@ include("template/header.php");
                             label: 'Target',
                             data: targetValues,
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
                         }, {
                             label: 'Penjualan',
                             data: valueSale,
-                            backgroundColor: 'rgba(255, 0, 0, 0.2)',
-                            borderColor: 'rgba(255, 0, 0, 1)',
-                            borderWidth: 1
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
                         }]
                     },
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                title: { display: true, text: 'Target' }
-                            },
-                            x: {
-                                title: { display: true, text: 'Area' }
-                            }
-                        },
-                        tooltips: {
-                            callbacks: {
-                                title: function(tooltipItem, data) {
-                                    const index = tooltipItem[0].index;
-                                    return productNames[index];
-                                }
+                                beginAtZero: true
                             }
                         }
                     }
                 });
-            })
-            .catch(error => console.error('Error fetching data:', error));
+            });
     }
 
-    window.onload = function() {
-        ChartLine();
-        ChartBar();
-    };
+    // Ambil nilai filter dari query string
+    const filter_channel = "<?php echo $filter_channel; ?>";
+
+    // Panggil fungsi grafik dengan filter
+    ChartLine(filter_channel);
+    ChartBar(filter_channel);
 </script>
 
 <?php

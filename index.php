@@ -11,7 +11,7 @@ include("template/header.php");
 </style>
 
 <div class="flex bg-gray-100 min-h-screen">
-    <div class="flex flex-col bg-white shadow-lg w-64 p-4">
+    <div class="flex sidebar flex-col bg-white shadow-lg w-64 p-4">
         <div class="flex items-center justify-between">
             <a href="/" class="text-xl font-semibold text-gray-700">Dashboard</a>
         </div>
@@ -26,6 +26,12 @@ include("template/header.php");
             <li>
                 <a href="dashboard.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
             </li>
+            <li>
+                <a href="lineChart.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">LineChart</a>
+            </li>
+            <li>
+                <a href="barChart.php" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">BarChart</a>
+            </li>
         </ul>
     </div>
 
@@ -36,6 +42,14 @@ include("template/header.php");
             <div class="mb-4">
                 <label for="year_name" class="block text-sm font-medium text-gray-700">Tahun</label>
                 <input type="date" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" id="year_name" name="year_name" required>
+            </div>
+
+            <div class="mb-4">
+            <label for="channel" class="block text-sm font-medium text-gray-700">Channel</label>
+                <select id="channel_name" name="channel_name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <option value="MT">MT</option>
+                    <option value="GT">GT</option>
+                </select>
             </div>
 
             <div class="mb-4">

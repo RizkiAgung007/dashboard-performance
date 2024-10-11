@@ -1,19 +1,29 @@
 <?php
 include("connect.php");
 
-$query = "SELECT area_grup.area_name, target_grup.target_value, product_grup.grup_name, year_grup.year_name, value_grup.value_name
-          FROM target_grup 
-          INNER JOIN area_grup ON target_grup.area_id = area_grup.id
-          INNER JOIN product_grup ON target_grup.product_grup_id = product_grup.id
-          INNER JOIN year_grup ON target_grup.year_id = year_grup.id
-          INNER JOIN value_grup ON target_grup.value_id = value_grup.   id";
-$result = mysqli_query($conn, $query);
+$filter_channel = isset($_GET['filter_channel']) ? $_GET['filter_channel'] : '';
 
-$data = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $data[] = $row;
+$sql = "SELECT tg.target_value, vg.value_name, ag.area_name, pg.grup_name
+FROM target_grup tg
+JOIN product_grup pg ON tg.product_grup_id = pg.id
+JOIN area_grup ag ON tg.area_id = ag.id
+JOIN value_grup vg ON tg.value_id = vg.id";
+
+if ($filter_channel) {
+    $sql .= " JOIN channel_grup cg ON tg.channel_id = cg.id WHERE cg.channel_name = '$filter_channel'";
 }
 
-echo json_encode($data); // Mengembalikan data dalam format JSON
+$result = mysqli_query($conn, $sql);
+$data = [];
+
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row;
+    }
+}
+
+header('Content-Type: application/json');
+echo json_encode($data);
+
 mysqli_close($conn);
 ?>

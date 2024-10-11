@@ -5,6 +5,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $target_value = $_POST['target_value'];
     $year_name = $_POST['year_name'];
     $value_name = $_POST['value_name'];
+    $channel_name = $_POST['channel_name'];
 
     include("connect.php");
 
@@ -66,7 +67,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $row = $resultValue -> fetch_assoc();
         $value_id = $row['id'];
 
-        // Jika tidak ada tahun yang sama maka buat baru
+        // Jika tidak ada value yang sama maka buat baru
     } else {
         $insertValue = "INSERT INTO value_grup (value_name) VALUES ('$value_name')";
         if (mysqli_query($conn, $insertValue) === TRUE) {
@@ -75,9 +76,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "ERROR: ". $insertValue. "<br>";
         }
     }
+
+    // Mengecek apakah sudah ada channel didalam database
+    $checkChannel = "SELECT id FROM channel_grup WHERE channel_name = '$channel_name'";
+    $resultChannel = mysqli_query($conn, $checkChannel);
+    if ($resultChannel -> num_rows > 0) {
+        $row = $resultChannel -> fetch_assoc();
+        $channel_id = $row['id'];
+
+        // Jika tidak ada channel yang sama maka buat baru
+    } else {
+        $insertChannel = "INSERT INTO channel_grup (channel_name) VALUES ('$channel_name')";
+        if (mysqli_query($conn, $insertChannel) === TRUE) {
+            $channel_id = mysqli_insert_id($conn);
+        } else {
+            echo "ERROR: ". $insertChannel. "<br>";
+        }
+    }
        
-    // Memasukkan tahun, produk, area, penjualan dan target ke dalam tabel target_grup
-    $insertTarget = "INSERT INTO target_grup (product_grup_id, area_id, target_value, year_id, value_id) VALUES ('$product_grup_id', '$area_id', '$target_value', '$year_id', '$value_id')";
+    // Memasukkan tahun, produk, area, penjualan, target, dan channel ke dalam tabel target_grup
+    $insertTarget = "INSERT INTO target_grup (product_grup_id, area_id, target_value, year_id, value_id, channel_id) VALUES ('$product_grup_id', '$area_id', '$target_value', '$year_id', '$value_id', '$channel_id')";
 
     if (mysqli_query($conn, $insertTarget) === TRUE) {
         echo "Data berhasil tersimpan";
